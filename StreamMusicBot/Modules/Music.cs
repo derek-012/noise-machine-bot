@@ -45,6 +45,22 @@ namespace NoiseMachine.Modules
             }
         }
 
+	  [Command("Play")]
+        public async Task Play([Remainder]string query)
+            => await ReplyAsync(await _musicService.PlayAsync(query, Context.Guild.Id));
+
+
+        [Command("Stop")]
+        public async Task Stop()
+            => await ReplyAsync(await _musicService.StopAsync(Context.Guild.Id));
+
+	 [Command("Pause")]
+        public async Task Pause()
+            => await ReplyAsync(await _musicService.PauseOrResumeAsync(Context.Guild.Id));
+
+        [Command("Resume")]
+        public async Task Resume()
+            => await ReplyAsync(await _musicService.ResumeAsync(Context.Guild.Id));
       
     }
 }

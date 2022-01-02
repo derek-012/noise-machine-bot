@@ -41,6 +41,74 @@ namespace NoiseMachine.Services
             => await _lavaSocketClient.DisconnectAsync(voiceChannel);
 
        
+  	public async Task<string> PlayAsync(string query, ulong guildId)
+        {
+            var _player = _lavaSocketClient.GetPlayer(guildId);
+            var results = await _lavaRestClient.SearchYouTubeAsync(query);
+
+            if (results.LoadType == LoadType.NoMatches || results.LoadType == LoadType.LoadFailed)
+            {
+                return "No matches found.";
+            }
+
+            var track = results.Tracks.FirstOrDefault();
+
+            if (_player.IsPlaying)
+            {
+                _player.Queue.Enqueue(track);
+                return $"{track.Title} has been added to the queue.";
+            }
+            else
+            {
+                await _player.PlayAsync(track);
+                return $"Now Playing: {track.Title}";
+            }
+        }
+
+	 public async Task<string> StopAsync(ulong guildId)
+        {
+            var _player = _lavaSocketClient.GetPlayer(guildId);
+            if (_player is null)
+                return "Error with Player";
+            await _player.StopAsync();
+            return "Music Playback Stopped.";
+        }
+	 public async Task<string> PauseOrResumeAsync(ulong guildId)
+        {
+            var _player = _lavaSocketClient.GetPlayer(guildId);
+            if (_player is null)
+                return "Player isn't playing.";
+
+            if (!_player.IsPaused)
+            {
+                await _player.PauseAsync();
+                return "Player is Paused.";
+            }
+            else
+            {
+                await _player.ResumeAsync();
+                return "Playback resumed.";
+            }
+        }
+
+        public async Task<string> ResumeAsync(ulong guildId)
+        {
+            var _player = _lavaSocketClient.GetPlayer(guildId);
+            if (_player is null)
+                return "Player isn't playing.";
+
+            if (_player.IsPaused)
+            {
+                await _player.ResumeAsync();
+                return "Playback resumed.";
+            }
+
+            return "Player is not paused.";
+        }
+
+
+
+
         private async Task LogAsync(LogMessage logMessage)
         {
             await _logService.LogAsync(logMessage);
