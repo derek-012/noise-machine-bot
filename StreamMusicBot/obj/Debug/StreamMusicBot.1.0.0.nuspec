@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>StreamMusicBot</id>
+    <version>1.0.0</version>
+    <authors>StreamMusicBot</authors>
+    <description>Package Description</description>
+    <dependencies>
+      <group targetFramework=".NETCoreApp3.0">
+        <dependency id="Discord.Net" version="2.1.1" exclude="Build,Analyzers" />
+        <dependency id="Victoria" version="4.0.17" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="C:\Users\vampi\source\repos\StreamMusicBot-master\StreamMusicBot\bin\Debug\netcoreapp3.0\StreamMusicBot.runtimeconfig.json" target="lib\netcoreapp3.0\StreamMusicBot.runtimeconfig.json" />
+    <file src="C:\Users\vampi\source\repos\StreamMusicBot-master\StreamMusicBot\bin\Debug\netcoreapp3.0\StreamMusicBot.dll" target="lib\netcoreapp3.0\StreamMusicBot.dll" />
+  </files>
+</package>
