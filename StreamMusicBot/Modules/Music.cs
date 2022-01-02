@@ -61,6 +61,15 @@ namespace NoiseMachine.Modules
         [Command("Resume")]
         public async Task Resume()
             => await ReplyAsync(await _musicService.ResumeAsync(Context.Guild.Id));
+
+	  [Command("Skip")]
+        public async Task Skip()
+            => await ReplyAsync(await _musicService.SkipAsync(Context.Guild.Id));
+
+        [Command("Volume")]
+        public async Task Volume(int vol)
+            => await ReplyAsync(await _musicService.SetVolumeAsync(vol, Context.Guild.Id));
+
       
     }
 }

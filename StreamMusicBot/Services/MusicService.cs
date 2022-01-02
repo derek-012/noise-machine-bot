@@ -40,8 +40,7 @@ namespace NoiseMachine.Services
         public async Task LeaveAsync(SocketVoiceChannel voiceChannel)
             => await _lavaSocketClient.DisconnectAsync(voiceChannel);
 
-       
-  	public async Task<string> PlayAsync(string query, ulong guildId)
+        public async Task<string> PlayAsync(string query, ulong guildId)
         {
             var _player = _lavaSocketClient.GetPlayer(guildId);
             var results = await _lavaRestClient.SearchYouTubeAsync(query);
@@ -65,7 +64,7 @@ namespace NoiseMachine.Services
             }
         }
 
-	 public async Task<string> StopAsync(ulong guildId)
+        public async Task<string> StopAsync(ulong guildId)
         {
             var _player = _lavaSocketClient.GetPlayer(guildId);
             if (_player is null)
@@ -73,7 +72,34 @@ namespace NoiseMachine.Services
             await _player.StopAsync();
             return "Music Playback Stopped.";
         }
-	 public async Task<string> PauseOrResumeAsync(ulong guildId)
+
+        public async Task<string> SkipAsync(ulong guildId)
+        {
+            var _player = _lavaSocketClient.GetPlayer(guildId);
+            if (_player is null || _player.Queue.Items.Count() is 0)
+                return "Nothing in queue.";
+
+            var oldTrack = _player.CurrentTrack;
+            await _player.SkipAsync();
+            return $"Skiped: {oldTrack.Title} \nNow Playing: {_player.CurrentTrack.Title}";
+        }
+
+        public async Task<string> SetVolumeAsync(int vol, ulong guildId)
+        {
+            var _player = _lavaSocketClient.GetPlayer(guildId);
+            if (_player is null)
+                return "Player isn't playing.";
+
+            if (vol > 150 || vol <= 2)
+            {
+                return "Please use a number between 2 - 150";
+            }
+
+            await _player.SetVolumeAsync(vol);
+            return $"Volume set to: {vol}";
+        }
+      
+        public async Task<string> PauseOrResumeAsync(ulong guildId)
         {
             var _player = _lavaSocketClient.GetPlayer(guildId);
             if (_player is null)
@@ -107,7 +133,24 @@ namespace NoiseMachine.Services
         }
 
 
+        private async Task ClientReadyAsync()
+        {
+            await _lavaSocketClient.StartAsync(_client, _configuration);
+        }
 
+        private async Task TrackFinished(LavaPlayer player, LavaTrack track, TrackEndReason reason)
+        {
+            if (!reason.ShouldPlayNext())
+                return;
+
+            if (!player.Queue.TryDequeue(out var item) || !(item is LavaTrack nextTrack))
+            {
+                await player.TextChannel.SendMessageAsync("There are no more tracks in the queue.");
+                return;
+            }
+
+            await player.PlayAsync(nextTrack);
+        }
 
         private async Task LogAsync(LogMessage logMessage)
         {
